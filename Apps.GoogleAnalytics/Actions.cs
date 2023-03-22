@@ -15,7 +15,7 @@ namespace Apps.GoogleAnalytics
     {
         [Action("Get all pages views data", Description = "Get all pages views data")]
         public GetPageViewsDataResponse GetAllPagesViewsData(string serviceAccountConfString, AuthenticationCredentialsProvider authenticationCredentialsProvider,
-            [ActionParameter] GetPageViewsDataRequest input)
+            [ActionParameter] BaseReportRequest input)
         {
             return GetContentViewsByDimension("ga:hostname", serviceAccountConfString, authenticationCredentialsProvider.Value,
                 input.StartDate, input.EndDate);
@@ -23,7 +23,7 @@ namespace Apps.GoogleAnalytics
 
         [Action("Get page views data", Description = "Get page views data")]
         public GetPageViewsDataResponse GetPageViewsData(string serviceAccountConfString, AuthenticationCredentialsProvider authenticationCredentialsProvider,
-            [ActionParameter] GetPageViewsDataRequest input)
+            [ActionParameter] BaseReportRequest input)
         {
             return GetContentViewsByDimension("ga:pagePath", serviceAccountConfString, authenticationCredentialsProvider.Value,
                 input.StartDate, input.EndDate);
@@ -31,7 +31,7 @@ namespace Apps.GoogleAnalytics
 
         [Action("Get users number by country", Description = "Get users number by country")]
         public GetUsersCountryResponse GetUsersNumberByCountry(string serviceAccountConfString, AuthenticationCredentialsProvider authenticationCredentialsProvider,
-            [ActionParameter] GetUsersCountryRequest input)
+            [ActionParameter] BaseReportRequest input)
         {  
             var dimensions = new List<Dimension> { new Dimension { Name = "ga:country" } };
             var metrics = new List<Metric> { new Metric { Expression = "ga:users", Alias = "Users number" } };
@@ -48,6 +48,28 @@ namespace Apps.GoogleAnalytics
             return new GetUsersCountryResponse()
             {
                 CountryUsers = response
+            };
+        }
+
+        [Action("Get users number by acquisition channel", Description = "Get users number by acquisition channel")]
+        public GetUsersAcquisitionResponse GetUsersNumberByAcquisition(string serviceAccountConfString, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+            [ActionParameter] BaseReportRequest input)
+        {
+            var dimensions = new List<Dimension> { new Dimension { Name = "ga:acquisitionTrafficChannel" } };
+            var metrics = new List<Metric> { new Metric { Expression = "ga:sessions", Alias = "Sessions number" } };
+
+            var result = GetReports(serviceAccountConfString, authenticationCredentialsProvider.Value, input.StartDate, input.EndDate,
+                dimensions, metrics);
+
+            var response = new Dictionary<string, int>();
+            foreach (var reportRow in result.Reports.First().Data.Rows)
+            {
+                response.Add(reportRow.Dimensions.First(), Int32.Parse(reportRow.Metrics.First().Values[0]));
+            }
+
+            return new GetUsersAcquisitionResponse()
+            {
+                AcquisitionUsers = response
             };
         }
 
