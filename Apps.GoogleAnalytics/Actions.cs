@@ -29,6 +29,28 @@ namespace Apps.GoogleAnalytics
                 input.StartDate, input.EndDate);
         }
 
+        [Action("Get users number by country", Description = "Get users number by country")]
+        public GetUsersCountryResponse GetUsersNumberByCountry(string serviceAccountConfString, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+            [ActionParameter] GetUsersCountryRequest input)
+        {  
+            var dimensions = new List<Dimension> { new Dimension { Name = "ga:country" } };
+            var metrics = new List<Metric> { new Metric { Expression = "ga:users", Alias = "Users number" } };
+
+            var result = GetReports(serviceAccountConfString, authenticationCredentialsProvider.Value, input.StartDate, input.EndDate,
+                dimensions, metrics);
+
+            var response = new Dictionary<string, int>();
+            foreach (var reportRow in result.Reports.First().Data.Rows)
+            {
+                response.Add(reportRow.Dimensions.First(), Int32.Parse(reportRow.Metrics.First().Values[0]));
+            }
+
+            return new GetUsersCountryResponse()
+            {
+                CountryUsers = response
+            };
+        }
+
         private GetPageViewsDataResponse GetContentViewsByDimension(string dimensionCode, string serviceAccountConfString,
             string viewId, DateTime startDate, DateTime endDate)
         {
