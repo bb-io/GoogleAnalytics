@@ -1,16 +1,12 @@
 {
   "definition": [
     {
-      "name": "url",
-      "description": "Link of your Worpdress API"
+      "name": "serviceAccountConfString",
+      "description": "Json string configuration of GCP service account"
     },
     {
-      "name": "login",
-      "description": "Your login in GoogleAnalytics"
-    },
-    {
-      "name": "applicationPassword",
-      "description": "Your application password"
+      "name": "viewId",
+      "description": "Your view ID in google analytics"
     }
   ],
   "communicationWrapperType": "HttpWrapper",
