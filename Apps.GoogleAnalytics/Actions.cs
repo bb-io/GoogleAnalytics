@@ -13,11 +13,26 @@ namespace Apps.GoogleAnalytics
     [ActionList]
     public class Actions
     {
-        [Action("Get page views data", Description = "Get all pages views data")]
+        [Action("Get all pages views data", Description = "Get all pages views data")]
+        public GetPageViewsDataResponse GetAllPagesViewsData(string serviceAccountConfString, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+            [ActionParameter] GetPageViewsDataRequest input)
+        {
+            return GetContentViewsByDimension("ga:hostname", serviceAccountConfString, authenticationCredentialsProvider.Value,
+                input.StartDate, input.EndDate);
+        }
+
+        [Action("Get page views data", Description = "Get page views data")]
         public GetPageViewsDataResponse GetPageViewsData(string serviceAccountConfString, AuthenticationCredentialsProvider authenticationCredentialsProvider,
             [ActionParameter] GetPageViewsDataRequest input)
         {
-            var dimensions = new List<Dimension> { new Dimension { Name = "ga:pageTitle" } };
+            return GetContentViewsByDimension("ga:pagePath", serviceAccountConfString, authenticationCredentialsProvider.Value,
+                input.StartDate, input.EndDate);
+        }
+
+        private GetPageViewsDataResponse GetContentViewsByDimension(string dimensionCode, string serviceAccountConfString,
+            string viewId, DateTime startDate, DateTime endDate)
+        {
+            var dimensions = new List<Dimension> { new Dimension { Name = dimensionCode } };
 
             var metrics = new List<Metric> {
                 new Metric { Expression = "ga:sessions", Alias = "Sessions" },
@@ -25,7 +40,7 @@ namespace Apps.GoogleAnalytics
                 new Metric { Expression = "ga:avgTimeOnPage", Alias = "Average time on pages" },
                 new Metric { Expression = "ga:exits", Alias = "Exits" } };
 
-            var result = GetReports(serviceAccountConfString, authenticationCredentialsProvider.Value, input.StartDate, input.EndDate,
+            var result = GetReports(serviceAccountConfString, viewId, startDate, endDate,
                 dimensions, metrics);
 
             var response = new Dictionary<string, PageViewsDataDto>();
