@@ -1,0 +1,20 @@
+{
+  "definition": [
+    {
+      "name": "url",
+      "description": "Link of your Worpdress API"
+    },
+    {
+      "name": "login",
+      "description": "Your login in GoogleAnalytics"
+    },
+    {
+      "name": "applicationPassword",
+      "description": "Your application password"
+    }
+  ],
+  "communicationWrapperType": "HttpWrapper",
+  "authenticationType": null,
+  "authenticationDefition": null,
+  "authenticationResponseMapping": null
+}
