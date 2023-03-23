@@ -39,10 +39,14 @@ namespace Apps.GoogleAnalytics
             var result = GetReports(serviceAccountConfString, authenticationCredentialsProvider.Value, input.StartDate, input.EndDate,
                 dimensions, metrics);
 
-            var response = new Dictionary<string, int>();
+            var response = new List<CountryUsersDto>();
             foreach (var reportRow in result.Reports.First().Data.Rows)
             {
-                response.Add(reportRow.Dimensions.First(), Int32.Parse(reportRow.Metrics.First().Values[0]));
+                response.Add(new CountryUsersDto()
+                {
+                    Country = reportRow.Dimensions.First(),
+                    UsersNumber = Int32.Parse(reportRow.Metrics.First().Values[0])
+                });
             }
 
             return new GetUsersCountryResponse()
@@ -61,10 +65,14 @@ namespace Apps.GoogleAnalytics
             var result = GetReports(serviceAccountConfString, authenticationCredentialsProvider.Value, input.StartDate, input.EndDate,
                 dimensions, metrics);
 
-            var response = new Dictionary<string, int>();
+            var response = new List<AcquisitionChannelUsersDto>();
             foreach (var reportRow in result.Reports.First().Data.Rows)
             {
-                response.Add(reportRow.Dimensions.First(), Int32.Parse(reportRow.Metrics.First().Values[0]));
+                response.Add(new AcquisitionChannelUsersDto()
+                {
+                    Channel = reportRow.Dimensions.First(),
+                    UsersNumber = Int32.Parse(reportRow.Metrics.First().Values[0])
+                });
             }
 
             return new GetUsersAcquisitionResponse()
@@ -87,11 +95,12 @@ namespace Apps.GoogleAnalytics
             var result = GetReports(serviceAccountConfString, viewId, startDate, endDate,
                 dimensions, metrics);
 
-            var response = new Dictionary<string, PageViewsDataDto>();
+            var response = new List<PageViewsDataDto>();
             foreach (var reportRow in result.Reports.First().Data.Rows) // iterate through the dimensions
             {
-                response.Add(reportRow.Dimensions.First(), new PageViewsDataDto()
+                response.Add(new PageViewsDataDto()
                 {
+                    PagePath = reportRow.Dimensions.First(),
                     Sessions = Int32.Parse(reportRow.Metrics.First().Values[0]),  // Metrics.First() to pick metric for the first date range (action accepts only one date range)
                     PageViews = Int32.Parse(reportRow.Metrics.First().Values[1]),
                     AverageTimeOnPage = reportRow.Metrics.First().Values[2],

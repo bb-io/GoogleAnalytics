@@ -8,6 +8,8 @@ namespace Apps.GoogleAnalytics.Dtos
 {
     public class PageViewsDataDto
     {
+        public string PagePath { get; set; }
+
         public int Sessions { get; set; }
 
         public int PageViews { get; set; }

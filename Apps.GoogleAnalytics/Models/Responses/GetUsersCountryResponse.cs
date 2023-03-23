@@ -9,6 +9,6 @@ namespace Apps.GoogleAnalytics.Models.Responses
 {
     public class GetUsersCountryResponse
     {
-        public Dictionary<string, int> CountryUsers { get; set; }
+        public IEnumerable<CountryUsersDto> CountryUsers { get; set; }
     }
 }

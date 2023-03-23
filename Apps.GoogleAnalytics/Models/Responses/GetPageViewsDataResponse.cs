@@ -9,6 +9,6 @@ namespace Apps.GoogleAnalytics.Models.Responses
 {
     public class GetPageViewsDataResponse
     {
-        public Dictionary<string, PageViewsDataDto> PageViewsData { get; set; }
+        public IEnumerable<PageViewsDataDto> PageViewsData { get; set; }
     }
 }

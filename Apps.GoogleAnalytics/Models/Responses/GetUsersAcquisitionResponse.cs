@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Apps.GoogleAnalytics.Dtos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,6 @@ namespace Apps.GoogleAnalytics.Models.Responses
 {
     public class GetUsersAcquisitionResponse
     {
-        public Dictionary<string, int> AcquisitionUsers { get; set; }
+        public IEnumerable<AcquisitionChannelUsersDto> AcquisitionUsers { get; set; }
     }
 }
