@@ -81,6 +81,104 @@ namespace Apps.GoogleAnalytics
             };
         }
 
+        [Action("Get total sessions", Description = "Get total sessions")]
+        public TotalSessionsResponse GetTotalSessions(string serviceAccountConfString, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+            [ActionParameter] BaseReportRequest input)
+        {
+            var dimensions = new List<Dimension> { new Dimension { Name = "ga:hostname" } };
+            var metrics = new List<Metric> { new Metric { Expression = "ga:sessions", Alias = "Sessions" } };
+            var result = GetReports(serviceAccountConfString, authenticationCredentialsProvider.Value,
+                input.StartDate, input.EndDate, dimensions, metrics);
+
+            var totalSessions = result.Reports.First().Data.Rows.First().Metrics.First().Values.First();
+            return new TotalSessionsResponse()
+            {
+                TotalSessionsNumber = Int32.Parse(totalSessions)
+            };
+        }
+
+        [Action("Get number of unique users", Description = "Get number of unique users")]
+        public UniqueUsersResponse GetUniqueUsers(string serviceAccountConfString, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+            [ActionParameter] BaseReportRequest input)
+        {
+            var dimensions = new List<Dimension> { new Dimension { Name = "ga:hostname" } };
+            var metrics = new List<Metric> { new Metric { Expression = "ga:users", Alias = "Users" } };
+            var result = GetReports(serviceAccountConfString, authenticationCredentialsProvider.Value,
+                input.StartDate, input.EndDate, dimensions, metrics);
+
+            var usersNumber = result.Reports.First().Data.Rows.First().Metrics.First().Values.First();
+            return new UniqueUsersResponse()
+            {
+                UsersNumber = Int32.Parse(usersNumber)
+            };
+        }
+
+        [Action("Get bounce rate", Description = "Get bounce rate")]
+        public BounceRateResponce GetBounceRate(string serviceAccountConfString, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+            [ActionParameter] BaseReportRequest input)
+        {
+            var dimensions = new List<Dimension> { new Dimension { Name = "ga:hostname" } };
+            var metrics = new List<Metric> { new Metric { Expression = "ga:bounceRate", Alias = "Bounce rate" } };
+            var result = GetReports(serviceAccountConfString, authenticationCredentialsProvider.Value,
+                input.StartDate, input.EndDate, dimensions, metrics);
+
+            var bounceRate = result.Reports.First().Data.Rows.First().Metrics.First().Values.First();
+            return new BounceRateResponce()
+            {
+                BounceRate = float.Parse(bounceRate)
+            };
+        }
+
+        [Action("Get conversion rate", Description = "Get goal conversion rate per page")]
+        public ConversionRateResponse GetConversionRate(string serviceAccountConfString, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+            [ActionParameter] BaseReportRequest input)
+        {
+            var dimensions = new List<Dimension> { new Dimension { Name = "ga:goalCompletionLocation" } };
+            var metrics = new List<Metric> { new Metric { Expression = "ga:goalConversionRateAll", Alias = "Conversion rate" } };
+            var result = GetReports(serviceAccountConfString, authenticationCredentialsProvider.Value,
+                input.StartDate, input.EndDate, dimensions, metrics);
+
+            var response = new List<GoalConversionRateDto>();
+            foreach (var reportRow in result.Reports.First().Data.Rows)
+            {
+                response.Add(new GoalConversionRateDto()
+                {
+                    Path = reportRow.Dimensions.First(),
+                    Rate = float.Parse(reportRow.Metrics.First().Values[0]),
+                });
+            }
+            return new ConversionRateResponse()
+            {
+                ConvertionRates = response
+            };
+        }
+
+        [Action("Get users number by language", Description = "Get users number by language")]
+        public GetUsersLanguageResponse GetUsersNumberByLanguage(string serviceAccountConfString, AuthenticationCredentialsProvider authenticationCredentialsProvider,
+            [ActionParameter] BaseReportRequest input)
+        {
+            var dimensions = new List<Dimension> { new Dimension { Name = "ga:language" } };
+            var metrics = new List<Metric> { new Metric { Expression = "ga:users", Alias = "Users number" } };
+
+            var result = GetReports(serviceAccountConfString, authenticationCredentialsProvider.Value, input.StartDate, input.EndDate,
+                dimensions, metrics);
+
+            var response = new List<LanguageUsersDto>();
+            foreach (var reportRow in result.Reports.First().Data.Rows)
+            {
+                response.Add(new LanguageUsersDto()
+                {
+                    LanguageCode = reportRow.Dimensions.First(),
+                    UsersNumber = Int32.Parse(reportRow.Metrics.First().Values[0])
+                });
+            }
+
+            return new GetUsersLanguageResponse()
+            {
+                LanguageUsers = response
+            };
+        }
+
         private GetPageViewsDataResponse GetContentViewsByDimension(string dimensionCode, string serviceAccountConfString,
             string viewId, DateTime startDate, DateTime endDate)
         {
@@ -130,7 +228,8 @@ namespace Apps.GoogleAnalytics
                 DateRanges = new List<DateRange> { dateRange },
                 Metrics = metrics,
                 Dimensions = dimensions,
-                ViewId = viewId
+                ViewId = viewId,
+                IncludeEmptyRows = true,
             };
             var getReportsRequest = new GetReportsRequest();
             getReportsRequest.ReportRequests = new List<ReportRequest> { reportRequest };
