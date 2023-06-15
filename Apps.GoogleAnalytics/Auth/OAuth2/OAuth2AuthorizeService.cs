@@ -1,4 +1,5 @@
-﻿using Blackbird.Applications.Sdk.Common.Authentication.OAuth2;
+﻿using Apps.GoogleAnalytics;
+using Blackbird.Applications.Sdk.Common.Authentication.OAuth2;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace Apps.GoogleDriveAnalytics.Authorization.OAuth2
