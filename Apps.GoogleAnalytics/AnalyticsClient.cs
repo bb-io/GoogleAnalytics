@@ -15,12 +15,12 @@ namespace Apps.GoogleAnalytics
 {
     public class AnalyticsClient
     {
-        private string _serviceAccountConfString;
+        private string _accessToken;
         private string _viewId;
 
         public AnalyticsClient(IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders) 
         {
-            _serviceAccountConfString = authenticationCredentialsProviders.First(p => p.KeyName == "serviceAccountConfString").Value;
+            _accessToken = authenticationCredentialsProviders.First(p => p.KeyName == "Authorization").Value;
             _viewId = authenticationCredentialsProviders.First(p => p.KeyName == "viewId").Value;
         }
 
@@ -46,13 +46,11 @@ namespace Apps.GoogleAnalytics
             var getReportsRequest = new GetReportsRequest();
             getReportsRequest.ReportRequests = new List<ReportRequest> { reportRequest };
 
-            ServiceAccountCredential? credential = GoogleCredential.FromJson(_serviceAccountConfString)
-                                                  .CreateScoped(scopes)
-                                                  .UnderlyingCredential as ServiceAccountCredential;
+            GoogleCredential credentials = GoogleCredential.FromAccessToken(_accessToken);
 
             var analyticsService = new AnalyticsReportingService(new BaseClientService.Initializer()
             {
-                HttpClientInitializer = credential,
+                HttpClientInitializer = credentials,
                 ApplicationName = "Blackbird",
             });
             var result = analyticsService.Reports.BatchGet(getReportsRequest).Execute();

@@ -14,25 +14,41 @@ namespace Apps.GoogleAnalytics.Connections
         {
             new ConnectionPropertyGroup
             {
-                Name = "Developer API token",
-                AuthenticationType = ConnectionAuthenticationType.Undefined,
+                Name = "OAuth",
+                AuthenticationType = ConnectionAuthenticationType.OAuth2,
                 ConnectionUsage = ConnectionUsage.Actions,
                 ConnectionProperties = new List<ConnectionProperty>()
                 {
-                    new ConnectionProperty("serviceAccountConfString"),
                     new ConnectionProperty("viewId")
                 }
-            }
+            },
+            //new ConnectionPropertyGroup
+            //{
+            //    Name = "Developer API token",
+            //    AuthenticationType = ConnectionAuthenticationType.Undefined,
+            //    ConnectionUsage = ConnectionUsage.Actions,
+            //    ConnectionProperties = new List<ConnectionProperty>()
+            //    {
+            //        new ConnectionProperty("serviceAccountConfString"),
+            //        new ConnectionProperty("viewId")
+            //    }
+            //}
         };
 
         public IEnumerable<AuthenticationCredentialsProvider> CreateAuthorizationCredentialsProviders(Dictionary<string, string> values)
         {
-            var serviceAccountConfString = values.First(v => v.Key == "serviceAccountConfString");
+            var accessToken = values.First(v => v.Key == "access_token");
             yield return new AuthenticationCredentialsProvider(
                 AuthenticationCredentialsRequestLocation.None,
-                serviceAccountConfString.Key,
-                serviceAccountConfString.Value
+                "Authorization",
+                accessToken.Value
             );
+            //var serviceAccountConfString = values.First(v => v.Key == "serviceAccountConfString");
+            //yield return new AuthenticationCredentialsProvider(
+            //    AuthenticationCredentialsRequestLocation.None,
+            //    serviceAccountConfString.Key,
+            //    serviceAccountConfString.Value
+            //);
 
             var viewId = values.First(v => v.Key == "viewId");
             yield return new AuthenticationCredentialsProvider(
