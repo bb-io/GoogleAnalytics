@@ -10,6 +10,7 @@ namespace Apps.GoogleAnalytics.Connections
 {
     public class ConnectionDefinition : IConnectionDefinition
     {
+        private const string _propertyIdName = "Property ID";
         public IEnumerable<ConnectionPropertyGroup> ConnectionPropertyGroups => new List<ConnectionPropertyGroup>()
         {
             new ConnectionPropertyGroup
@@ -19,7 +20,7 @@ namespace Apps.GoogleAnalytics.Connections
                 ConnectionUsage = ConnectionUsage.Actions,
                 ConnectionProperties = new List<ConnectionProperty>()
                 {
-                    new ConnectionProperty("viewId")
+                    new ConnectionProperty(_propertyIdName)
                 }
             },
             //new ConnectionPropertyGroup
@@ -50,10 +51,10 @@ namespace Apps.GoogleAnalytics.Connections
             //    serviceAccountConfString.Value
             //);
 
-            var viewId = values.First(v => v.Key == "viewId");
+            var viewId = values.First(v => v.Key == _propertyIdName);
             yield return new AuthenticationCredentialsProvider(
                 AuthenticationCredentialsRequestLocation.None,
-                viewId.Key,
+                "propertyId",
                 viewId.Value
             );
         }
