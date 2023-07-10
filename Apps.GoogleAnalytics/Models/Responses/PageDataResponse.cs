@@ -35,5 +35,8 @@ namespace Apps.GoogleAnalytics.Models.Responses
 
         [Display("Bounce rate")]
         public double BounceRate { get; set; }
+
+        [Display("Summary")]
+        public string Summary { get; set; }
     }
 }

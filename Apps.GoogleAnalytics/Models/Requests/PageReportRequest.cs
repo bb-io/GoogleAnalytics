@@ -14,5 +14,8 @@ namespace Apps.GoogleAnalytics.Models.Requests
 
         [Display("Path")]
         public string Path { get; set; }
+
+        [Display("Match exact?")]
+        public bool MatchExact { get; set; }
     }
 }

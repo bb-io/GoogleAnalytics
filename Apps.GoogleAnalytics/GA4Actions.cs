@@ -20,6 +20,8 @@ namespace Apps.GoogleAnalytics
             [ActionParameter] PageReportRequest input)
         {
             var client = new DataClient(authenticationCredentialsProviders);
+
+            var matchType = input.MatchExact ? Filter.Types.StringFilter.Types.MatchType.Exact : Filter.Types.StringFilter.Types.MatchType.Contains;
             var request = new RunReportRequest
             {
                 DateRanges = { 
@@ -48,7 +50,7 @@ namespace Apps.GoogleAnalytics
                     Filter = new Filter
                     {
                         FieldName = "pagePath",
-                        StringFilter = new Filter.Types.StringFilter{ MatchType = Filter.Types.StringFilter.Types.MatchType.Contains, Value = input.Path}
+                        StringFilter = new Filter.Types.StringFilter{ MatchType = matchType, Value = input.Path}
                     }
                 }
             };
@@ -73,7 +75,18 @@ namespace Apps.GoogleAnalytics
                 Sessions = int.Parse(row.MetricValues[5].Value),
                 ScrolledUsers = int.Parse(row.MetricValues[6].Value),
                 Conversions = int.Parse(row.MetricValues[7].Value),
-                BounceRate = double.Parse(row.MetricValues[8].Value)
+                BounceRate = double.Parse(row.MetricValues[8].Value),
+                Summary = @$"
+                    New users: {row.MetricValues[0].Value}
+                    Total users: {row.MetricValues[1].Value}
+                    Active users: {row.MetricValues[2].Value}
+                    Conversion rate: {row.MetricValues[3].Value}
+                    Transactions: {row.MetricValues[4].Value}
+                    Sessions: {row.MetricValues[5].Value}
+                    Scrolled users: {row.MetricValues[6].Value}
+                    Conversions: {row.MetricValues[7].Value}
+                    Bounce rate: {row.MetricValues[8].Value}
+                "
             };
         }
     }
