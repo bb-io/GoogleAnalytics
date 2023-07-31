@@ -22,6 +22,7 @@ namespace Apps.GoogleAnalytics
             var client = new DataClient(authenticationCredentialsProviders);
 
             var matchType = input.MatchExact ? Filter.Types.StringFilter.Types.MatchType.Exact : Filter.Types.StringFilter.Types.MatchType.Contains;
+            var path = new Uri(input.Url).AbsolutePath;
             var request = new RunReportRequest
             {
                 DateRanges = { 
@@ -50,7 +51,7 @@ namespace Apps.GoogleAnalytics
                     Filter = new Filter
                     {
                         FieldName = "pagePath",
-                        StringFilter = new Filter.Types.StringFilter{ MatchType = matchType, Value = input.Path}
+                        StringFilter = new Filter.Types.StringFilter{ MatchType = matchType, Value = path }
                     }
                 }
             };

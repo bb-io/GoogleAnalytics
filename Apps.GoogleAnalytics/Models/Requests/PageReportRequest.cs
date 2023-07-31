@@ -12,8 +12,8 @@ namespace Apps.GoogleAnalytics.Models.Requests
         [Display("Last number of days")]
         public int Days { get; set; }
 
-        [Display("Path")]
-        public string Path { get; set; }
+        [Display("URL")]
+        public string Url { get; set; }
 
         [Display("Match exact?")]
         public bool MatchExact { get; set; }
