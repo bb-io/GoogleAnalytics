@@ -4,7 +4,7 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Product>Blackbird Google Analytics</Product>
+        <Product>Google Analytics</Product>
         <Description>Web analytics service that tracks and reports website traffic.</Description>
         <Version>1.0.0</Version>
         <AssemblyName>Apps.GoogleAnalytics</AssemblyName>
@@ -17,4 +17,7 @@
         <PackageReference Include="Google.Apis.AnalyticsReporting.v4" Version="1.61.0.2484"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <EmbeddedResource CopyToOutputDirectory="Always" Include="image\icon.png"/>
+    </ItemGroup>
 </Project>
