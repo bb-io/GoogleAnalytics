@@ -40,7 +40,7 @@ public class Ga4Actions : Ga4Invocable
                     StringFilter = new()
                     {
                         Value = new Uri(input.Url).AbsolutePath,
-                        MatchType = input.MatchExact
+                        MatchType = input.MatchExact.GetValueOrDefault(true)
                             ? Filter.Types.StringFilter.Types.MatchType.Exact
                             : Filter.Types.StringFilter.Types.MatchType.Contains
                     }
