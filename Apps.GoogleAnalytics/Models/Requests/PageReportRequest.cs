@@ -11,5 +11,5 @@ public class PageReportRequest
     public string Url { get; set; }
 
     [Display("Match exact?")]
-    public bool MatchExact { get; set; }
+    public bool? MatchExact { get; set; }
 }
