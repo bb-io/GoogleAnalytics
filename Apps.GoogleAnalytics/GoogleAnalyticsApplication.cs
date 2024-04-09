@@ -2,12 +2,19 @@
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Authentication.OAuth2;
 using Blackbird.Applications.Sdk.Common.Invocation;
+using Blackbird.Applications.Sdk.Common.Metadata;
 
 namespace Apps.GoogleAnalytics;
 
-public class GoogleAnalyticsApplication : BaseInvocable, IApplication
+public class GoogleAnalyticsApplication : BaseInvocable, IApplication, ICategoryProvider
 {
     private readonly Dictionary<Type, object> _typesInstances;
+
+    public IEnumerable<ApplicationCategory> Categories
+    {
+        get => [ApplicationCategory.Analytics, ApplicationCategory.GoogleApps];
+        set { }
+    }
 
     public GoogleAnalyticsApplication(InvocationContext invocationContext) : base(invocationContext)
     {
@@ -24,7 +31,7 @@ public class GoogleAnalyticsApplication : BaseInvocable, IApplication
     {
         if (!_typesInstances.TryGetValue(typeof(T), out var value))
             throw new InvalidOperationException($"Instance of type '{typeof(T)}' not found");
-        
+
         return (T)value;
     }
 
