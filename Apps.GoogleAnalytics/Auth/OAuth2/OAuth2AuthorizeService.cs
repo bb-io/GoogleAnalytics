@@ -24,6 +24,7 @@ public class OAuth2AuthorizeService : BaseInvocable, IOAuth2AuthorizeService
             { "scope", ApplicationConstants.Scope },
             { "state", values["state"] },
             { "access_type", "offline" },
+            { "prompt", "consent" },
             { "authorization_url", Urls.OAuth},
             { "actual_redirect_uri", InvocationContext.UriInfo.AuthorizationCodeRedirectUri.ToString() },
         };
