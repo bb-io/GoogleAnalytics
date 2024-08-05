@@ -7,6 +7,7 @@ using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Google.Analytics.Data.V1Beta;
+using Google.Protobuf.Collections;
 
 namespace Apps.GoogleAnalytics.Actions;
 
@@ -52,11 +53,19 @@ public class Ga4Actions : Ga4Invocable
 
         if (report == null) throw new Exception(ExceptionMessages.ReportNull);
 
-        if (report.RowCount == 0) throw new Exception(ExceptionMessages.ReportEmptyRows);
-
         if (report.RowCount > 1) throw new Exception(ExceptionMessages.ReportMultiplePages);
 
-        var row = report.Rows.First();
+        var row = report.Rows.FirstOrDefault();
+
+        if (row == null)
+        {
+            var metrics = new RepeatedField<MetricValue>();
+            Enumerable.Range(0, 9).ToList().ForEach(i => metrics.Add(new MetricValue { Value = "0" }));
+            return new()
+            {
+                Summary = metrics.GetSummary()
+            };
+        }
 
         return new()
         {
