@@ -29,7 +29,7 @@ Before you can connect you need to make sure that:
 
 ## Actions
 
-- **Get page data** Get metrics of a specific page from the last x days
+- **Get page data** Get metrics of a specific page from the last x days. You can either input the full URL of the page or just the path name. You can use the 'match type' optional input to specify how the URL or path name should be handled. If multiple paths match the input path then the results will be a sum of each of the matched paths.
 	- New users
 	- Total users
 	- Active users
@@ -39,7 +39,9 @@ Before you can connect you need to make sure that:
 	- Scrolled users
 	- Conversions
 	- Bounce rate
-	- Summary
+	- Summary (returns a summary of the data in string form)
+	- Matched paths (returns a list of paths that were matched)
+
 
 ## Example
 
