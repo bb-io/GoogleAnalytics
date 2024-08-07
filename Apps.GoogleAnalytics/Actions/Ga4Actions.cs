@@ -21,6 +21,15 @@ public class Ga4Actions : Ga4Invocable
     [Action("Get page data", Description = "Get metrics of a specific page from the last x days")]
     public async Task<PageDataResponse> GetPageData([ActionParameter] PageReportRequest input)
     {
+        var matchTypeInt = input.MatchType == null ? 0 : int.Parse(input.MatchType);
+        var path = input.UrlOrPath;
+
+        try
+        {
+            path = new Uri(input.UrlOrPath).AbsolutePath;
+        }
+        catch { }
+
         var request = new RunReportRequest
         {
             DateRanges =
@@ -40,10 +49,8 @@ public class Ga4Actions : Ga4Invocable
                     FieldName = "pagePath",
                     StringFilter = new()
                     {
-                        Value = new Uri(input.Url).AbsolutePath,
-                        MatchType = input.MatchExact.GetValueOrDefault(true)
-                            ? Filter.Types.StringFilter.Types.MatchType.Exact
-                            : Filter.Types.StringFilter.Types.MatchType.Contains
+                        Value = path,
+                        MatchType = (Filter.Types.StringFilter.Types.MatchType) matchTypeInt,
                     }
                 }
             }
@@ -53,32 +60,47 @@ public class Ga4Actions : Ga4Invocable
 
         if (report == null) throw new Exception(ExceptionMessages.ReportNull);
 
-        if (report.RowCount > 1) throw new Exception(ExceptionMessages.ReportMultiplePages);
+        //if (report.RowCount > 1) throw new Exception(ExceptionMessages.ReportMultiplePages);
 
-        var row = report.Rows.FirstOrDefault();
-
-        if (row == null)
+        if (report.Rows.Count == 0)
         {
             var metrics = new RepeatedField<MetricValue>();
             Enumerable.Range(0, 9).ToList().ForEach(i => metrics.Add(new MetricValue { Value = "0" }));
             return new()
             {
+                MatchedPaths = new List<string>() { },
                 Summary = metrics.GetSummary()
             };
         }
 
         return new()
         {
-            NewUsers = int.Parse(row.MetricValues[0].Value),
-            TotalUsers = int.Parse(row.MetricValues[1].Value),
-            ActiveUsers = int.Parse(row.MetricValues[2].Value),
-            UserConversionRate = double.Parse(row.MetricValues[3].Value),
-            Transactions = int.Parse(row.MetricValues[4].Value),
-            Sessions = int.Parse(row.MetricValues[5].Value),
-            ScrolledUsers = int.Parse(row.MetricValues[6].Value),
-            Conversions = int.Parse(row.MetricValues[7].Value),
-            BounceRate = double.Parse(row.MetricValues[8].Value),
-            Summary = row.MetricValues.GetSummary()
+            MatchedPaths = report.Rows.Select(x => x.DimensionValues[0].Value),
+            NewUsers = GetSumOfColumn(report, 0),
+            TotalUsers = GetSumOfColumn(report, 1),
+            ActiveUsers = GetSumOfColumn(report, 2),
+            UserConversionRate = GetSumOfColumn(report, 3),
+            Transactions = GetSumOfColumn(report, 4),
+            Sessions = GetSumOfColumn(report, 5),
+            ScrolledUsers = GetSumOfColumn(report, 6),
+            Conversions = GetSumOfColumn(report, 7),
+            BounceRate = GetSumOfColumn(report, 8),
+            Summary = GetSummary(report),
         };
     }
+
+    private int GetSumOfColumn(RunReportResponse report, int column) => report.Rows.Sum(x => int.Parse(x.MetricValues[column].Value));
+
+    private string GetSummary(RunReportResponse report)
+        => @$"
+            New users: {GetSumOfColumn(report, 0)}
+            Total users: {GetSumOfColumn(report, 1)}
+            Active users: {GetSumOfColumn(report, 2)}
+            Conversion rate: {GetSumOfColumn(report, 3)}
+            Transactions: {GetSumOfColumn(report, 4)}
+            Sessions: {GetSumOfColumn(report, 5)}
+            Scrolled users: {GetSumOfColumn(report, 6)}
+            Conversions: {GetSumOfColumn(report, 7)}
+            Bounce rate: {GetSumOfColumn(report, 8)}
+        ";
 }

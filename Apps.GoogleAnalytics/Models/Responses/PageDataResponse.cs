@@ -4,6 +4,9 @@ namespace Apps.GoogleAnalytics.Models.Responses;
 
 public class PageDataResponse
 {
+    [Display("Matched paths")]
+    public IEnumerable<string> MatchedPaths { get; set; }
+
     [Display("New users")]
     public int NewUsers { get; set; }
 
