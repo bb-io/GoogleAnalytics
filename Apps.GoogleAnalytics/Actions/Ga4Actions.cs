@@ -1,4 +1,5 @@
-﻿using Apps.GoogleAnalytics.Constants;
+﻿using System.Globalization;
+using Apps.GoogleAnalytics.Constants;
 using Apps.GoogleAnalytics.Extensions;
 using Apps.GoogleAnalytics.Invocables;
 using Apps.GoogleAnalytics.Models.Requests;
@@ -57,7 +58,6 @@ public class Ga4Actions : Ga4Invocable
         };
 
         var report = await Client.RunReport(request);
-
         if (report == null) throw new Exception(ExceptionMessages.ReportNull);
 
         //if (report.RowCount > 1) throw new Exception(ExceptionMessages.ReportMultiplePages);
@@ -76,31 +76,35 @@ public class Ga4Actions : Ga4Invocable
         return new()
         {
             MatchedPaths = report.Rows.Select(x => x.DimensionValues[0].Value),
-            NewUsers = GetSumOfColumn(report, 0),
-            TotalUsers = GetSumOfColumn(report, 1),
-            ActiveUsers = GetSumOfColumn(report, 2),
-            UserConversionRate = GetSumOfColumn(report, 3),
-            Transactions = GetSumOfColumn(report, 4),
-            Sessions = GetSumOfColumn(report, 5),
-            ScrolledUsers = GetSumOfColumn(report, 6),
-            Conversions = GetSumOfColumn(report, 7),
-            BounceRate = GetSumOfColumn(report, 8),
+            NewUsers = GetSumOfColumnAsInt(report, 0),
+            TotalUsers = GetSumOfColumnAsInt(report, 1),
+            ActiveUsers = GetSumOfColumnAsInt(report, 2),
+            UserConversionRate = GetSumOfColumnAsDouble(report, 3),
+            Transactions = GetSumOfColumnAsInt(report, 4),
+            Sessions = GetSumOfColumnAsInt(report, 5),
+            ScrolledUsers = GetSumOfColumnAsInt(report, 6),
+            Conversions = GetSumOfColumnAsInt(report, 7),
+            BounceRate = GetSumOfColumnAsDouble(report, 8),
             Summary = GetSummary(report),
         };
     }
 
-    private int GetSumOfColumn(RunReportResponse report, int column) => report.Rows.Sum(x => int.Parse(x.MetricValues[column].Value));
+    private int GetSumOfColumnAsInt(RunReportResponse report, int column)
+        => report.Rows.Sum(x => int.Parse(x.MetricValues[column].Value));
+
+    private double GetSumOfColumnAsDouble(RunReportResponse report, int column)
+        => report.Rows.Sum(x => double.Parse(x.MetricValues[column].Value, CultureInfo.InvariantCulture));
 
     private string GetSummary(RunReportResponse report)
         => @$"
-            New users: {GetSumOfColumn(report, 0)}
-            Total users: {GetSumOfColumn(report, 1)}
-            Active users: {GetSumOfColumn(report, 2)}
-            Conversion rate: {GetSumOfColumn(report, 3)}
-            Transactions: {GetSumOfColumn(report, 4)}
-            Sessions: {GetSumOfColumn(report, 5)}
-            Scrolled users: {GetSumOfColumn(report, 6)}
-            Conversions: {GetSumOfColumn(report, 7)}
-            Bounce rate: {GetSumOfColumn(report, 8)}
-        ";
+        New users: {GetSumOfColumnAsInt(report, 0)}
+        Total users: {GetSumOfColumnAsInt(report, 1)}
+        Active users: {GetSumOfColumnAsInt(report, 2)}
+        Conversion rate: {GetSumOfColumnAsDouble(report, 3)}
+        Transactions: {GetSumOfColumnAsInt(report, 4)}
+        Sessions: {GetSumOfColumnAsInt(report, 5)}
+        Scrolled users: {GetSumOfColumnAsInt(report, 6)}
+        Conversions: {GetSumOfColumnAsInt(report, 7)}
+        Bounce rate: {GetSumOfColumnAsDouble(report, 8)}
+    ";
 }
