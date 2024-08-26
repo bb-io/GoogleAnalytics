@@ -9,9 +9,6 @@
     <AssemblyName>Apps.GoogleAnalytics</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Assets\Styles\Branding.html" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Assets\Styles\Branding.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
