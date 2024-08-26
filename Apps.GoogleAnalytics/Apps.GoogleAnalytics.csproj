@@ -5,9 +5,17 @@
     <Nullable>enable</Nullable>
     <Product>Google Analytics</Product>
     <Description>Web analytics service that tracks and reports website traffic.</Description>
-    <Version>1.0.8</Version>
+    <Version>1.0.9</Version>
     <AssemblyName>Apps.GoogleAnalytics</AssemblyName>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Assets\Styles\Branding.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\Styles\Branding.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Blackbird.Applications.Sdk.Common" Version="2.6.0" />
     <PackageReference Include="Blackbird.Applications.Sdk.Utils" Version="1.0.12" />
