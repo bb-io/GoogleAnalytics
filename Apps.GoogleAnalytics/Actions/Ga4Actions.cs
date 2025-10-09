@@ -12,7 +12,7 @@ using Google.Protobuf.Collections;
 
 namespace Apps.GoogleAnalytics.Actions;
 
-[ActionList]
+[ActionList("Metric")]
 public class Ga4Actions : Ga4Invocable
 {
     public Ga4Actions(InvocationContext invocationContext) : base(invocationContext)
