@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <Product>Google Analytics</Product>
     <Description>Web analytics service that tracks and reports website traffic.</Description>
-    <Version>1.0.10</Version>
+    <Version>1.0.11</Version>
     <AssemblyName>Apps.GoogleAnalytics</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
@@ -14,7 +14,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Blackbird.Applications.SDK.Blueprints" Version="1.0.0-rc.10308" />
+    <PackageReference Include="Blackbird.Applications.SDK.Blueprints" Version="1.0.1" />
     <PackageReference Include="Blackbird.Applications.Sdk.Utils" Version="1.0.12" />
     <PackageReference Include="Google.Analytics.Data.V1Beta" Version="2.0.0-beta03" />
     <PackageReference Include="Google.Apis.AnalyticsReporting.v4" Version="1.61.0.2484" />

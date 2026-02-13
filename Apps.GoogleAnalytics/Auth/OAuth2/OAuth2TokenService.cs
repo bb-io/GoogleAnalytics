@@ -1,13 +1,14 @@
-﻿using System.Text.Json;
-using Apps.GoogleAnalytics.Constants;
+﻿using Apps.GoogleAnalytics.Constants;
 using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Authentication.OAuth2;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using RestSharp;
+using System.Text.Json;
 
 namespace Apps.GoogleAnalytics.Auth.OAuth2;
 
-public class OAuth2TokenService : BaseInvocable, IOAuth2TokenService
+public class OAuth2TokenService : BaseInvocable, IOAuth2TokenService, ITokenRefreshable
 {
     public OAuth2TokenService(InvocationContext invocationContext) : base(invocationContext)
     {
@@ -17,6 +18,19 @@ public class OAuth2TokenService : BaseInvocable, IOAuth2TokenService
     {
         var expiresAt = DateTime.Parse(values[CredsNames.ExpiresAt]);
         return DateTime.UtcNow > expiresAt;
+    }
+
+    public int? GetRefreshTokenExprireInMinutes(Dictionary<string, string> values)
+    {
+        if (!values.TryGetValue(CredsNames.ExpiresAt, out var expireValue))
+            return null;
+
+        if (!DateTime.TryParse(expireValue, out var expireDate))
+            return null;
+
+        var difference = expireDate - DateTime.UtcNow;
+
+        return (int)difference.TotalMinutes - 5;
     }
 
     public Task<Dictionary<string, string>> RefreshToken(Dictionary<string, string> values, CancellationToken cancellationToken)
